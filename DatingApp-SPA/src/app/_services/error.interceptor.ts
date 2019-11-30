@@ -11,7 +11,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): import('rxjs').Observable<import('@angular/common/http').HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError(error => {
-        if (error.sattus === 401) {
+        if (error.status === 401) {
           return throwError(error.statusText);
         }
         if (error instanceof HttpErrorResponse) {
@@ -21,7 +21,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           }
           const serverError = error.error;
           let modalStateErrors = '';
-          if (serverError.errors && typeof serverError.erros === 'object') {
+          if (serverError.errors && typeof serverError.errors === 'object') {
             for (const key in serverError.errors) {
               if (serverError.errors[key]) {
                 modalStateErrors += serverError.errors[key] + '\n';
