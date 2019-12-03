@@ -15,10 +15,9 @@ export class MemberDetailResolver implements Resolve<User> {
         return this.userServices.getUser(+route.params['id']).pipe(
             catchError(error => {
                 this.alertify.error(error);
-                this.router.navigate(['members']);
+                this.router.navigate(['/members']);
                 return of(null);
                 })
         );
     }
-
 }
