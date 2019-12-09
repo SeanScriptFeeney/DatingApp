@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Dtos;
 using DatingApp.API.Models;
@@ -10,45 +11,55 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DatingApp.API.Controllers {
-    [Route ("api/[controller]")]
+namespace DatingApp.API.Controllers
+{
+    [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase {
+    public class AuthController : ControllerBase
+    {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-        public AuthController (IAuthRepository repo, IConfiguration config) {
+        public IMapper _mapper { get; }
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
+        {
+            _mapper = mapper;
             _config = config;
             _repo = repo;
         }
 
-        [HttpPost ("register")]
-        public async Task<IActionResult> Register (UserForRegisterDto userForRegisterDto) {
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
+        {
 
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
 
-            if (await _repo.UserExists (userForRegisterDto.Username)) {
-                return BadRequest ("Username already exists");
+            if (await _repo.UserExists(userForRegisterDto.Username))
+            {
+                return BadRequest("Username already exists");
             }
 
-            var userToCreate = new User {
+            var userToCreate = new User
+            {
                 Username = userForRegisterDto.Username
             };
 
-            var createdUser = await _repo.Register (userToCreate, userForRegisterDto.Password);
+            var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
 
-            return StatusCode (201);
+            return StatusCode(201);
         }
 
-        [HttpPost ("login")]
-        public async Task<IActionResult> Login (UserForLoginDto userForLoginDto) {
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
+        {
 
             var userFromRepo = await _repo.Login(userForLoginDto.Username.ToLower(), userForLoginDto.Password);
 
-            if (userFromRepo == null) {
-                return Unauthorized ();
+            if (userFromRepo == null)
+            {
+                return Unauthorized();
             }
 
-            var claims = new [] {
+            var claims = new[] {
                 new Claim (ClaimTypes.NameIdentifier, userFromRepo.Id.ToString ()),
                 new Claim (ClaimTypes.Name, userFromRepo.Username)
             };
@@ -68,7 +79,9 @@ namespace DatingApp.API.Controllers {
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new {token = tokenHandler.WriteToken(token)});
+            var user = _mapper.Map<UserForListDto>(userFromRepo);
+
+            return Ok(new { token = tokenHandler.WriteToken(token), user });
         }
     }
 }
