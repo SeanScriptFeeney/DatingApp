@@ -64,6 +64,12 @@ export class PhotoEditorComponent implements OnInit {
           isMain: res.isMain
         };
         this.photos.push(photo);
+
+        if(photo.isMain) {
+          this.authService.changeMemberPhoto(photo.url);
+          this.authService.currentuser.photoUrl = photo.url;
+          localStorage.setItem('user', JSON.stringify(this.authService.currentuser));
+        }
       }
     };
   }
@@ -95,6 +101,6 @@ export class PhotoEditorComponent implements OnInit {
         this.alertify.error('Failed to remove photo');
       }
       );
-    })
+    });
   }
 }
