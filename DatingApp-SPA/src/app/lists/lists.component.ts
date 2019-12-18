@@ -29,7 +29,7 @@ export class ListsComponent implements OnInit {
       this.pagination = data['users'].pagination;
     });
 
-    this.likesParam = 'Likes';
+    this.likesParam = 'Likers';
   }
 
   loadUsers() {
