@@ -1,2 +1,4 @@
 {
+    "appService.defaultWebAppToDeploy": "/subscriptions/e1a18ec5-b023-4826-bff4-f4ce21f67b28/resourceGroups/DatingAppResourceGroup/providers/Microsoft.Web/sites/sean-dating-app",
+    "appService.deploySubpath": ""
 }
